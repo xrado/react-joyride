@@ -111,9 +111,9 @@ componentDidUpdate (prevProps, prevState) {
 
 Please refer to the source code of the demo if you need a practical [example](https://github.com/gilbarbara/react-joyride/tree/demo/app/scripts).
 
-## Options
+## Props
 
-You can change the initial options passing props to the component. All optional.
+You can change the default settings passing props to the component. All optional.
 
 **debug** {bool}: Console.log Joyride's inner actions. Defaults to `false`
 
@@ -124,6 +124,8 @@ You can change the initial options passing props to the component. All optional.
 **resizeDebounce** {bool}: Delay the reposition of the current step while the window is being resized. Defaults to `false`
 
 **resizeDebounceDelay** {number}: The amount of delay for the `resizeDebounce` callback. Defaults to `200`
+
+**run** {bool}: Starts the tours if there are steps. Defaults to `false`
 
 **scrollOffset** {number}: The scrollTop offset used in `scrollToSteps`. Defaults to `20`
 
@@ -143,7 +145,7 @@ You can change the initial options passing props to the component. All optional.
 
 **tooltipOffset** {number}: The tooltip offset from the target. Defaults to `30`
 
-**type** {string}: The type of your presentation. It can be `continuous` (played sequencially with the Next button) or `single`. Defaults to `single`
+**type** {string}: The type of your presentation. It can be `continuous` (played sequencially with the Next button) or `casual`. Defaults to `casual`
 
 **completeCallback** {function}: It will be called after an user has completed all the steps or skipped the tour and passes two parameters, the steps `{array}` and if the tour was skipped `{boolean}`. Defaults to `undefined`
 
