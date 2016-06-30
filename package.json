@@ -1,6 +1,6 @@
 {
   "name": "react-joyride",
-  "version": "1.5.0",
+  "version": "2.0.0",
   "main": "./lib/index.js",
   "description": "Create walkthroughs and guided tours for your apps",
   "author": "Gil Barbara <gilbarbara@gmail.com>",
@@ -22,27 +22,32 @@
     "tour"
   ],
   "dependencies": {
-    "object-assign": "^4.0",
-    "scroll": "1.0"
+    "scroll": "2.0"
   },
   "peerDependencies": {
     "react": ">=0.14",
     "react-dom": ">=0.14"
   },
   "devDependencies": {
-    "babel-core": "^6.7",
-    "babel-eslint": "^6.0",
-    "babel-plugin-add-module-exports": "^0.1",
+    "babel-core": "^6.10",
+    "babel-eslint": "^6.1",
+    "babel-plugin-add-module-exports": "^0.2",
     "babel-plugin-transform-decorators-legacy": "^1.3",
-    "babel-preset-es2015": "^6.6",
+    "babel-plugin-transform-inline-environment-variables": "^6.8",
+    "babel-plugin-transform-object-assign": "^6.8",
+    "babel-plugin-transform-runtime": "^6.9",
+    "babel-preset-es2015": "^6.9",
     "babel-preset-react": "^6.5",
     "babel-preset-stage-1": "^6.5",
-    "babel-register": "^6.7",
+    "babel-register": "^6.9",
+    "core-decorators": "^0.12",
     "del": "^2.2",
-    "eslint": "^2.7",
-    "eslint-config-airbnb": "^6.2",
-    "eslint-plugin-react": "^4.3",
-    "expect": "^1.16",
+    "eslint": "^2.13",
+    "eslint-config-airbnb": "^9.0",
+    "eslint-plugin-import": "^1.9",
+    "eslint-plugin-jsx-a11y": "^1.5",
+    "eslint-plugin-react": "^5.2",
+    "expect": "^1.20",
     "gulp": "^3.9",
     "gulp-autoprefixer": "^3.1",
     "gulp-babel": "^6.1",
@@ -50,24 +55,13 @@
     "gulp-load-plugins": "^1.2",
     "gulp-plumber": "^1.1",
     "gulp-rename": "^1.2",
-    "gulp-sass": "^2.2",
-    "jsdom": "^8.3",
-    "mocha": "^2.4",
-    "react": "^15.0",
-    "react-addons-test-utils": "^15.0",
-    "react-dom": "^15.0",
-    "run-sequence": "^1.1"
-  },
-  "babel": {
-    "presets": [
-      "es2015",
-      "react",
-      "stage-1"
-    ],
-    "plugins": [
-      "add-module-exports",
-      "transform-decorators-legacy"
-    ]
+    "gulp-sass": "^2.3",
+    "jsdom": "^9.2",
+    "mocha": "^2.5",
+    "react": "^15.1",
+    "react-addons-test-utils": "^15.1",
+    "react-dom": "^15.1",
+    "run-sequence": "^1.2"
   },
   "scripts": {
     "lint": "eslint src test",
@@ -77,7 +71,7 @@
     "test:watch": "npm test -- --watch"
   },
   "engines": {
-    "node": ">=5.0.0",
+    "node": ">=6.0.0",
     "npm": ">=3.0.0"
   }
 }

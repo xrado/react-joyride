@@ -19,9 +19,7 @@ gulp.task('lint', function() {
 
 gulp.task('scripts', function() {
   return gulp.src('src/scripts/*.js')
-    .pipe($.babel({
-      presets: ['es2015', 'react', 'stage-1']
-    }))
+    .pipe($.babel())
     .pipe(gulp.dest('lib/scripts'));
 });
 

@@ -1,5 +1,4 @@
 import React from 'react';
-import assign from 'object-assign';
 
 export default class Tooltip extends React.Component {
   constructor(props) {
@@ -39,7 +38,7 @@ export default class Tooltip extends React.Component {
     yPos: -1000
   };
 
-  _getArrowPosition(position) {
+  getArrowPosition(position) {
     let arrowPosition;
 
     if (window.innerWidth < 480) {
@@ -55,7 +54,7 @@ export default class Tooltip extends React.Component {
     return arrowPosition;
   }
 
-  _generateArrow(opts = {}) {
+  generateArrow(opts = {}) {
     let width;
     let height;
     let rotate;
@@ -90,7 +89,7 @@ export default class Tooltip extends React.Component {
     return `data:image/svg+xml,%3Csvg%20width%3D%22${width}%22%20height%3D%22${height}%22%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpolygon%20points%3D%220%2C%200%208%2C%208%2016%2C0%22%20fill%3D%22${opts.color}%22%20transform%3D%22scale%28${opts.scale}%29%20rotate%28${rotate}%29%22%3E%3C%2Fpolygon%3E%3C%2Fsvg%3E`;
   }
 
-  _setStyles(opts, styles, stepStyles) {
+  setStyles(opts, styles, stepStyles) {
     styles.hole = {
       top: Math.round((opts.target.top - document.body.getBoundingClientRect().top) - 5),
       left: Math.round(opts.target.left - 5),
@@ -108,7 +107,7 @@ export default class Tooltip extends React.Component {
     /* Styling */
     if (stepStyles) {
       if (stepStyles.backgroundColor) {
-        styles.arrow.backgroundImage = `url("${this._generateArrow({
+        styles.arrow.backgroundImage = `url("${this.generateArrow({
           location: opts.positonBaseClass,
           color: stepStyles.backgroundColor
         })}")`;
@@ -146,19 +145,19 @@ export default class Tooltip extends React.Component {
       }
 
       if (stepStyles.back) {
-        styles.buttons.back = assign(styles.buttons.back, stepStyles.back);
+        styles.buttons.back = Object.assign({}, styles.buttons.back, stepStyles.back);
       }
 
       if (stepStyles.button) {
-        styles.buttons.primary = assign(styles.buttons.primary, stepStyles.button);
+        styles.buttons.primary = Object.assign({}, styles.buttons.primary, stepStyles.button);
       }
 
       if (stepStyles.close) {
-        styles.buttons.close = assign(styles.buttons.close, stepStyles.close);
+        styles.buttons.close = Object.assign({}, styles.buttons.close, stepStyles.close);
       }
 
       if (stepStyles.skip) {
-        styles.buttons.skip = assign(styles.buttons.skip, stepStyles.skip);
+        styles.buttons.skip = Object.assign({}, styles.buttons.skip, stepStyles.skip);
       }
     }
 
@@ -191,12 +190,12 @@ export default class Tooltip extends React.Component {
       opts.tooltip = document.querySelector('.joyride-tooltip').getBoundingClientRect();
       opts.targetMiddle = (opts.target.left + opts.target.width / 2);
       opts.arrowPosition = (((opts.targetMiddle - props.xPos) / opts.tooltip.width) * 100).toFixed(2);
-      opts.arrowPosition = `${this._getArrowPosition(opts.arrowPosition)}%`;
+      opts.arrowPosition = `${this.getArrowPosition(opts.arrowPosition)}%`;
 
       styles.arrow.left = opts.arrowPosition;
     }
 
-    styles = this._setStyles(opts, styles, step.style);
+    styles = this.setStyles(opts, styles, step.style);
 
     if (props.standalone) {
       opts.classes.push('joyride-tooltip--standalone');
@@ -230,29 +229,25 @@ export default class Tooltip extends React.Component {
         {opts.header}
         <div className="joyride-tooltip__main" dangerouslySetInnerHTML={{ __html: step.text || '' }} />
         <div className="joyride-tooltip__footer">
-          {props.buttons.skip
-            ? (
-             <a
-               href="#"
-               className="joyride-tooltip__button joyride-tooltip__button--skip"
-               style={styles.buttons.skip}
-               data-type="skip"
-               onClick={props.onClick}>
-               {props.buttons.skip}
-             </a>
-           )
+          {props.buttons.skip ?
+           (<a
+             href="#"
+             className="joyride-tooltip__button joyride-tooltip__button--skip"
+             style={styles.buttons.skip}
+             data-type="skip"
+             onClick={props.onClick}>
+             {props.buttons.skip}
+           </a>)
             : undefined}
           {props.buttons.secondary ?
-           (
-             <a
-               href="#"
-               className="joyride-tooltip__button joyride-tooltip__button--secondary"
-               style={styles.buttons.back}
-               data-type="back"
-               onClick={props.onClick}>
-               {props.buttons.secondary}
-             </a>
-           )
+           (<a
+             href="#"
+             className="joyride-tooltip__button joyride-tooltip__button--secondary"
+             style={styles.buttons.back}
+             data-type="back"
+             onClick={props.onClick}>
+             {props.buttons.secondary}
+           </a>)
             : undefined}
           <a
             href="#"

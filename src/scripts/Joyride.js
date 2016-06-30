@@ -1,5 +1,6 @@
 import React from 'react';
 import scroll from 'scroll';
+import autobind from 'core-decorators/lib/autobind';
 import Beacon from './Beacon';
 import Tooltip from './Tooltip';
 
@@ -16,7 +17,7 @@ const listeners = {
 };
 const isTouch = 'ontouchstart' in window || navigator.msMaxTouchPoints;
 
-export default class Component extends React.Component {
+export const Joyride = ComposedComponent => class extends React.Component {
   constructor(props) {
     super(props);
 
@@ -75,7 +76,7 @@ export default class Component extends React.Component {
   componentDidMount() {
     const props = this.props;
 
-    this._log('joyride:initialized', [props]);
+    this.logger('joyride:initialized', [props]);
 
     if (props.resizeDebounce) {
       let timeoutId;
@@ -85,27 +86,27 @@ export default class Component extends React.Component {
           clearTimeout(timeoutId);
           timeoutId = setTimeout(() => {
             timeoutId = null;
-            this._calcPlacement();
+            this.calcPlacement();
           }, props.resizeDebounceDelay);
         })();
     }
     else {
-      listeners.resize = this._calcPlacement;
+      listeners.resize = this.calcPlacement;
     }
     window.addEventListener('resize', listeners.resize);
 
     if (props.keyboardNavigation) {
-      listeners.keyboard = this._keyboardNavigation;
+      listeners.keyboard = this.keyboardNavigation;
       document.body.addEventListener('keydown', listeners.keyboard);
     }
   }
 
   componentWillReceiveProps(nextProps) {
     const props = this.props;
-    this._log('joyride: willReceiveProps', [nextProps]);
+    this.logger('joyride: willReceiveProps', [nextProps]);
 
     if (nextProps.steps.length !== props.steps.length) {
-      this._log('joyride:changedSteps', [nextProps.steps]);
+      this.logger('joyride:changedSteps', [nextProps.steps]);
 
       if (!nextProps.steps.length) {
         this.reset();
@@ -128,11 +129,11 @@ export default class Component extends React.Component {
     const props = this.props;
 
     if ((state.tooltip || (state.play && props.steps[state.index])) && state.xPos < 0) {
-      this._calcPlacement();
+      this.calcPlacement();
     }
 
     if (state.play && props.scrollToSteps && (props.scrollToFirstStep || (state.index > 0 || prevState.index > state.index))) {
-      scroll.top(this._getBrowser() === 'firefox' ? document.documentElement : document.body, this._getScrollTop());
+      scroll.top(this.getBrowser() === 'firefox' ? document.documentElement : document.body, this.getScrollTop());
     }
   }
 
@@ -158,13 +159,13 @@ export default class Component extends React.Component {
   start(autorun) {
     const autoStart = autorun === true;
 
-    this._log('joyride:start', ['autorun:', autoStart]);
+    this.logger('joyride:start', ['autorun:', autoStart]);
 
     this.setState({
       play: true
     }, () => {
       if (autoStart) {
-        this._toggleTooltip(true);
+        this.toggleTooltip(true);
       }
     });
   }
@@ -173,7 +174,7 @@ export default class Component extends React.Component {
    * Stop the tour
    */
   stop() {
-    this._log('joyride:stop');
+    this.logger('joyride:stop');
 
     this.setState({
       showTooltip: false,
@@ -191,7 +192,7 @@ export default class Component extends React.Component {
     const newState = JSON.parse(JSON.stringify(defaultState));
     newState.play = shouldRestart;
 
-    this._log('joyride:reset', ['restart:', shouldRestart]);
+    this.logger('joyride:reset', ['restart:', shouldRestart]);
 
     // Force a re-render if necessary
     if (shouldRestart && this.state.play === shouldRestart && this.state.index === 0) {
@@ -209,7 +210,7 @@ export default class Component extends React.Component {
     const state = this.state;
     const props = this.props;
 
-    this._log('joyride:getProgress', ['steps:', props.steps]);
+    this.logger('joyride:getProgress', ['steps:', props.steps]);
 
     return {
       index: state.index,
@@ -258,7 +259,7 @@ export default class Component extends React.Component {
         newSteps.push(s);
       }
       else {
-        this._log('joyride:parseSteps', ['Element not rendered in the DOM. Skipped..', s], true);
+        this.logger('joyride:parseSteps', ['Element not rendered in the DOM. Skipped..', s], true);
       }
     });
 
@@ -272,7 +273,7 @@ export default class Component extends React.Component {
     let eventType;
     let key;
 
-    this._log('joyride:addTooltip', ['data:', data]);
+    this.logger('joyride:addTooltip', ['data:', data]);
 
     if (parseData.length) {
       newData = parseData[0];
@@ -284,8 +285,8 @@ export default class Component extends React.Component {
     el.dataset.tooltip = JSON.stringify(data);
 
     if (eventType === 'hover' && !isTouch) {
-      listeners.tooltips[key] = { event: 'mouseenter', cb: this._onTooltipTrigger };
-      listeners.tooltips[`${key}mouseleave`] = { event: 'mouseleave', cb: this._onTooltipTrigger };
+      listeners.tooltips[key] = { event: 'mouseenter', cb: this.onTooltipTrigger };
+      listeners.tooltips[`${key}mouseleave`] = { event: 'mouseleave', cb: this.onTooltipTrigger };
       listeners.tooltips[`${key}click`] = {
         event: 'click', cb: (e) => {
           e.preventDefault();
@@ -297,12 +298,12 @@ export default class Component extends React.Component {
       el.addEventListener('click', listeners.tooltips[`${key}click`].cb);
     }
     else {
-      listeners.tooltips[key] = { event: 'click', cb: this._onTooltipTrigger };
+      listeners.tooltips[key] = { event: 'click', cb: this.onTooltipTrigger };
       el.addEventListener('click', listeners.tooltips[key].cb);
     }
   }
 
-  _log(type, msg, warn) {
+  logger(type, msg, warn) {
     const logger = warn ? console.warn || console.error : console.log; //eslint-disable-line no-console
 
     if (this.props.debug) {
@@ -318,10 +319,10 @@ export default class Component extends React.Component {
    * @private
    * @returns {String}
    */
-  _getBrowser() {
+  getBrowser() {
     // Return cached result if avalible, else get result then cache it.
-    if (this._browser) {
-      return this._browser;
+    if (this.browser) {
+      return this.browser;
     }
 
     const isOpera = Boolean(window.opera) || navigator.userAgent.indexOf(' OPR/') >= 0;
@@ -332,7 +333,7 @@ export default class Component extends React.Component {
     const isChrome = Boolean(window.chrome) && !isOpera;// Chrome 1+
     const isIE = /*@cc_on!@*/ Boolean(document.documentMode); // At least IE6
 
-    return (this._browser =
+    return (this.browser =
       isOpera ? 'opera' :
       isFirefox ? 'firefox' :
       isSafari ? 'safari' :
@@ -346,7 +347,7 @@ export default class Component extends React.Component {
    * @param {String|Element} el - Element node or selector
    * @returns {{height: number, width: number}}
    */
-  _getElementDimensions(el) {
+  getElementDimensions(el) {
     // Get the DOM Node if you pass in a string
     const newEl = (typeof el === 'string') ? document.querySelector(el) : el;
 
@@ -364,7 +365,7 @@ export default class Component extends React.Component {
    * Get the scrollTop position
    * @returns {number}
    */
-  _getScrollTop() {
+  getScrollTop() {
     const state = this.state;
     const props = this.props;
     const step = props.steps[state.index];
@@ -387,7 +388,7 @@ export default class Component extends React.Component {
    * Keydown event listener
    * @param {Event} e - Keyboard event
    */
-  _keyboardNavigation(e) {
+  keyboardNavigation(e) {
     const state = this.state;
     const props = this.props;
     const intKey = (window.Event) ? e.which : e.keyCode;
@@ -399,11 +400,11 @@ export default class Component extends React.Component {
       }
 
       if (intKey === 27) {
-        this._toggleTooltip(false, state.index + 1);
+        this.toggleTooltip(false, state.index + 1);
       }
       else if ([13, 32].indexOf(intKey) > -1) {
         hasSteps = Boolean(props.steps[state.index + 1]);
-        this._toggleTooltip(hasSteps, state.index + 1, 'next');
+        this.toggleTooltip(hasSteps, state.index + 1, 'next');
       }
     }
   }
@@ -412,7 +413,7 @@ export default class Component extends React.Component {
    * Tooltip event listener
    * @param {Event} e - Click event
    */
-  _onTooltipTrigger(e) {
+  onTooltipTrigger(e) {
     e.preventDefault();
     let tooltip = e.currentTarget.dataset.tooltip;
 
@@ -439,16 +440,17 @@ export default class Component extends React.Component {
    * Beacon click event listener
    * @param {Event} e - Click event
    */
-  _onBeaconTrigger(e) {
+  @autobind
+  onBeaconTrigger(e) {
     e.preventDefault();
-    this._toggleTooltip(true, this.state.index);
+    this.toggleTooltip(true, this.state.index);
   }
 
   /**
    * Tooltip click event listener
    * @param {Event} e - Click event
    */
-  _onClickTooltip(e) {
+  onClickTooltip(e) {
     e.preventDefault();
     e.stopPropagation();
 
@@ -476,7 +478,7 @@ export default class Component extends React.Component {
       });
     }
     else if (type) {
-      this._toggleTooltip(
+      this.toggleTooltip(
         (props.type === 'continuous' || props.type === 'guided')
         && ['close', 'skip'].indexOf(type) === -1
         && Boolean(props.steps[newIndex])
@@ -491,7 +493,7 @@ export default class Component extends React.Component {
    * @param {Number} [index] - The tour's new index
    * @param {string} [action]
    */
-  _toggleTooltip(show, index, action) {
+  toggleTooltip(show, index, action) {
     const newIndex = (index !== undefined ? index : this.state.index);
     const props = this.props;
 
@@ -519,7 +521,7 @@ export default class Component extends React.Component {
   /**
    * Position absolute elements next to its target
    */
-  _calcPlacement() {
+  calcPlacement() {
     const state = this.state;
     const props = this.props;
     const step = state.tooltip ? state.tooltip : props.steps[state.index];
@@ -537,7 +539,7 @@ export default class Component extends React.Component {
       position = step.position;
       body = document.body.getBoundingClientRect();
       target = document.querySelector(step.selector).getBoundingClientRect();
-      component = this._getElementDimensions((showTooltip ? '.joyride-tooltip' : '.joyride-beacon'));
+      component = this.getElementDimensions((showTooltip ? '.joyride-tooltip' : '.joyride-beacon'));
 
       // Change the step position in the tooltip won't fit in the window
       if (/^left/.test(position) && target.left - (component.width + props.tooltipOffset) < 0) {
@@ -579,8 +581,8 @@ export default class Component extends React.Component {
       }
 
       this.setState({
-        xPos: this._preventWindowOverflow(Math.ceil(placement.x), 'x', component.width, component.height),
-        yPos: this._preventWindowOverflow(Math.ceil(placement.y), 'y', component.width, component.height),
+        xPos: this.preventWindowOverflow(Math.ceil(placement.x), 'x', component.width, component.height),
+        yPos: this.preventWindowOverflow(Math.ceil(placement.y), 'y', component.width, component.height),
         position
       });
     }
@@ -594,7 +596,7 @@ export default class Component extends React.Component {
    * @param {Number} elHeight - The target element height
    * @returns {Number}
    */
-  _preventWindowOverflow(value, axis, elWidth, elHeight) {
+  preventWindowOverflow(value, axis, elWidth, elHeight) {
     const winWidth = window.innerWidth;
     const docHeight = document.body.offsetHeight;
     let newValue = value;
@@ -625,7 +627,7 @@ export default class Component extends React.Component {
    * @returns {*}
    * @private
    */
-  _createComponent(update) {
+  createComponent(update) {
     const state = this.state;
     const props = this.props;
     const currentStep = Object.assign({}, state.tooltip || props.steps[state.index]);
@@ -637,7 +639,7 @@ export default class Component extends React.Component {
     const showOverlay = state.tooltip ? false : props.showOverlay;
     let component;
 
-    this._log(`joyride:${(update ? 'sizeComponent' : 'renderComponent')}`, [
+    this.logger(`joyride:${(update ? 'sizeComponent' : 'renderComponent')}`, [
       'component:', state.showTooltip || state.tooltip ? 'Tooltip' : 'Beacon',
       'target:', target
     ]);
@@ -670,7 +672,7 @@ export default class Component extends React.Component {
 
         component = React.createElement(Tooltip, {
           animate: state.xPos > -1,
-          browser: this._getBrowser(),
+          browser: this.getBrowser(),
           buttons,
           cssPosition,
           showOverlay,
@@ -679,7 +681,7 @@ export default class Component extends React.Component {
           type: props.type,
           xPos: state.xPos,
           yPos: state.yPos,
-          onClick: this._onClickTooltip
+          onClick: this.onClickTooltip
         });
       }
       else {
@@ -688,7 +690,7 @@ export default class Component extends React.Component {
           step: currentStep,
           xPos: state.xPos,
           yPos: state.yPos,
-          onTrigger: this._onBeaconTrigger,
+          onTrigger: this.onBeaconTrigger,
           eventType: currentStep.type || 'click'
         });
       }
@@ -705,24 +707,26 @@ export default class Component extends React.Component {
     let standaloneTooltip;
 
     if (state.play && state.xPos < 0 && hasStep) {
-      this._log('joyride:render', ['step:', props.steps[state.index]]);
+      this.logger('joyride:render', ['step:', props.steps[state.index]]);
     }
     else if (!state.play && state.tooltip) {
-      this._log('joyride:render', ['tooltip:', state.tooltip]);
+      this.logger('joyride:render', ['tooltip:', state.tooltip]);
     }
 
     if (state.tooltip) {
-      standaloneTooltip = this._createComponent();
+      standaloneTooltip = this.createComponent();
     }
     else if (state.play && hasStep) {
-      component = this._createComponent(state.xPos < 0);
+      component = this.createComponent(state.xPos < 0);
     }
 
-    return (
-      <div className="joyride">
-        {component}
-        {standaloneTooltip}
-      </div>
-    );
+    return <ComposedComponent start={this.start} />;
+
+    /*return (
+     <div className="joyride">
+     {component}
+     {standaloneTooltip}
+     </div>
+     );*/
   }
-}
+};

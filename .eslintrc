@@ -23,6 +23,7 @@
     "camelcase": 0,
     "comma-dangle": 0,
     "dot-notation": 1,
+    "global-require": 0,
     "indent": [
       1,
       2,

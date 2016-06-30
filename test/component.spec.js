@@ -6,53 +6,53 @@ import jsdom from 'jsdom';
 let Component;
 
 function setup() {
-    const props = {
-        steps: [
-            {
-                title: 'Auto Scroll',
-                text: 'Scroll to correct position if required. <i>It can be turned off</i>',
-                selector: '#area-chart',
-                position: 'top'
-            },
-            {
-                title: 'Hide Elements',
-                text: 'You can really customize the UI',
-                textAlign: 'center',
-                selector: '#donut-chart',
-                position: 'left'
-            }
-        ]
-    };
+  const props = {
+    steps: [
+      {
+        title: 'Auto Scroll',
+        text: 'Scroll to correct position if required. <i>It can be turned off</i>',
+        selector: '#area-chart',
+        position: 'top'
+      },
+      {
+        title: 'Hide Elements',
+        text: 'You can really customize the UI',
+        textAlign: 'center',
+        selector: '#donut-chart',
+        position: 'left'
+      }
+    ]
+  };
 
-    const renderer = TestUtils.createRenderer();
-    renderer.render(<Component { ...props } />);
-    const output = renderer.getRenderOutput();
+  const renderer = TestUtils.createRenderer();
+  renderer.render(<Component { ...props } />);
+  const output = renderer.getRenderOutput();
 
-    return {
-        props,
-        output,
-        renderer
-    };
+  return {
+    props,
+    output,
+    renderer
+  };
 }
 
 describe('Component', () => {
-    before(function(done) {
-        jsdom.env({
-            html: "<!doctype html><html><body></body></html>",
-            done: function(errs, window) {
-                global.window = window;
-                global.navigator = window.navigator;
+  before((done) => {
+    jsdom.env({
+      html: '<!doctype html><html><body></body></html>',
+      done: (errs, window) => {
+        global.window = window;
+        global.navigator = window.navigator;
 
-                Component = require('../lib/scripts/Component');
-                done();
-            }
-        });
+        Component = require('../src/scripts/Joyride');
+        done();
+      }
     });
+  });
 
-    it('should render correctly before calling start', () => {
-        const { output } = setup();
+  it('should render correctly before calling start', () => {
+    const { output } = setup();
 
-        expect(output.props.className).toBe('joyride');
-        expect(output.props.children).toEqual([ undefined, undefined ]);
-    });
+    expect(output.props.className).toBe('joyride');
+    expect(output.props.children).toEqual([undefined, undefined]);
+  });
 });
